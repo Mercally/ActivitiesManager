@@ -38,7 +38,7 @@ namespace ActivitiesManager.WebApi.Areas.ServiceCommon.Controllers
         }
 
         [HttpGet]
-        [Route("id/{id}")]
+        [Route("{id}")]
         public IActionResult ObtenerActividad(int id)
         {
             var Todo = ServiceBusiness

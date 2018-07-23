@@ -1,12 +1,9 @@
-﻿using ActivitiesManager.WebApiRestFulClient.Metadata.WebApi;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ActivitiesManager.WebApiRestFulClient.Services.WebApi;
 
 namespace ActivitiesManager.WebApiRestFulClient
 {
     public interface IPublicServicesWebApi
     {
-        IProyectosControllerApi ProyectosControllerApi();
+        ProyectosControllerApi ProyectosControllerApi { get; }
     }
 }

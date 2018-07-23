@@ -24,7 +24,7 @@ namespace ActivitiesManager.WebApp
         {
             services.AddMvc();
 
-            services.AddScoped(typeof(IPublicServicesWebApi), typeof(PublicServicesWebApi));
+            services.AddSingleton(typeof(IPublicServicesWebApi), typeof(PublicServicesWebApi));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +37,7 @@ namespace ActivitiesManager.WebApp
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Inicio/Error");
             }
 
             app.UseStaticFiles();
@@ -46,7 +46,7 @@ namespace ActivitiesManager.WebApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Inicio}/{action=Index}/{id?}");
             });
         }
     }

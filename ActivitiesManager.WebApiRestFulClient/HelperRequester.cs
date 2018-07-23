@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using ActivitiesManager.Shared.Models.Web;
 
 namespace ActivitiesManager.WebApiRestFulClient
 {
@@ -19,8 +21,12 @@ namespace ActivitiesManager.WebApiRestFulClient
         /// <param name="Data">Objeto a enviar en la petición</param>
         /// <param name="TimeOut">Tiempo de espera en minutos</param>
         /// <returns></returns>
-        internal static T Request<T>(string Url, HttpMethodEnum Method, object Data = null, int TimeOut = 1)
+        internal static HttpResponse<T> Request<T>(string Url, HttpMethodEnum Method, object Data = null, int TimeOut = 1)
         {
+            var Response = new HttpResponse<T>();
+            T Value = default(T);
+            HttpStatusCode HttpStatus = HttpStatusCode.OK;
+
             using (HttpClient client = new HttpClient())
             {
                 try
@@ -47,22 +53,25 @@ namespace ActivitiesManager.WebApiRestFulClient
                             break;
                     }
 
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
                         T result = response.Content.ReadAsAsync<T>().Result;
-                        return result;
+                        Value = result;
                     }
-                    else
-                    {
-                        return default(T);
-                    }
+
+                    HttpStatus = response.StatusCode;
                 }
                 catch (Exception ex)
                 {
                     // Excepciones
-                    return default(T);
+                    Value = default(T);
                 }
             }
+
+            Response.Value = Value;
+            Response.StatusCode = HttpStatus;
+
+            return Response;
         }
 
         internal static async Task<T> RequestAsync<T>(string Url, HttpMethodEnum Method, object Data = null, int TimeOut = 1)

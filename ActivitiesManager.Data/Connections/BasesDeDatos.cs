@@ -10,15 +10,13 @@ namespace ActivitiesManager.Data.Connections
     /// </summary>
     internal class BasesDeDatos
     {
-        public static IConfiguration Configuration { get; set; }
-
         private static string GetConnectionString(string ConnectionName)
         {
             var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json");
 
-            Configuration = builder.Build();
+            var Configuration = builder.Build();
 
             return Configuration.GetConnectionString(ConnectionName);
         }
