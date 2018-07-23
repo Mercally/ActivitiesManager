@@ -1,36 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ActivitiesManager.Data.Context;
+﻿using ActivitiesManager.Data.Context;
 using ActivitiesManager.Data.Interfaces;
 using ActivitiesManager.Shared.Models;
+using System.Collections.Generic;
 
 namespace ActivitiesManager.Business.Common
 {
-    public class ProyectoBusiness : IServiceComponent
+    public class ProyectoBusiness
     {
-        public ProyectoBusiness(IActivitiesManagerProvider activitiesManagerProvider)
-        {
-            DbProvider = activitiesManagerProvider;
-        }
-
-        public IActivitiesManagerProvider DbProvider { get; }
-
         public List<Proyecto> ObtenerTodos()
         {
             List<Proyecto> Todos = new List<Proyecto>();
 
+            using (var DbProvider = new ActivitiesManagerProvider())
+            {
                 Todos = DbProvider
-                    .Actmgr_Proyectos
-                    .ObtenerTodos();
-
-                Todos = DbProvider
-                    .Actmgr_Proyectos
-                    .ObtenerTodos();
-
-                Todos = DbProvider
-                    .Actmgr_Proyectos
-                    .ObtenerTodos();
+                        .Actmgr_Proyectos
+                        .ObtenerTodos();
+            }
 
             return Todos;
         }

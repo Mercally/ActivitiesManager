@@ -16,12 +16,15 @@ namespace ActivitiesManager.Data.Models.Query
         public DataTable ResultadoTipoQuery { get; set; }
         public int CantidadCambios { get; set; }
         public System.Exception Excepcion { get; set; }
+        public object Resultado { get; set; }
+        
+        public QueryBuilder Consulta { get; set; }
 
         public bool EsCorrecto
         {
             get
             {
-                return ResultadoTipoQuery != null && Excepcion == null;
+                return Excepcion == null;
             }
         }
 
@@ -30,25 +33,52 @@ namespace ActivitiesManager.Data.Models.Query
         /// </summary>
         /// <typeparam name="T">Tipo de dato a retornar</typeparam>
         /// <returns>Lista de objetos de tipo especificado</returns>
-        public List<T> ConvertirResultadoLista<T>()
+        public T ConvertirResultado<T>()
         {
-            List<T> ListaResultado = new List<T>();
+            bool IsList = false;
+            Object Resultado = null;
+            Type ArgumentType = null;
+            Type Tipo = null;
 
             if (!this.EsCorrecto)
             {
-                return new List<T>();
+                return default(T);
             }
 
-            try
+            var CurrentType = typeof(T);
+            if (CurrentType.IsGenericType && CurrentType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                Type Tipo = typeof(T);
-                string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
+                var Args = CurrentType.GetGenericArguments();
+                ArgumentType = CurrentType.GetGenericArguments()[0];
+                var IListRef = typeof(List<>);
+                Type[] IListParam = { ArgumentType };
 
+                Resultado = Activator.CreateInstance(IListRef.MakeGenericType(IListParam));
+                IsList = true;
+                Tipo = ArgumentType;
+            }
+            else
+            {
+                IsList = false;
+                Tipo = typeof(T);
+            }
+            
+            try
+            {   
+                string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
                 PropertyInfo[] PropInfo = Tipo.GetProperties();
 
                 foreach (DataRow Row in ResultadoTipoQuery.Rows)
                 {
-                    T obj = (T)Activator.CreateInstance(typeof(T));
+                    Object obj = null;
+                    if (IsList)
+                    {
+                        obj = Activator.CreateInstance(ArgumentType);
+                    }
+                    else
+                    {
+                        obj = Activator.CreateInstance(typeof(T));
+                    }
 
                     for (int i = 0; i < Propiedades.Length; i++)
                     {
@@ -69,66 +99,17 @@ namespace ActivitiesManager.Data.Models.Query
                         }
                     }
 
-                    ListaResultado.Add(obj);
-                }
-
-                return ListaResultado as List<T>;
-            }
-            catch (Exception Ex)
-            {
-                Excepcion = Ex;
-                return new List<T>();
-            }
-        }
-
-        /// <summary>
-        /// Obtiene el resultado convertido al tipo especificado
-        /// </summary>
-        /// <typeparam name="T">Tipo de dato a retornar</typeparam>
-        /// <returns>Objetos de tipo especificado</returns>
-        public T ConvertiresultadoUnico<T>()
-        {
-            List<T> ListaResultado = new List<T>();
-
-            if (!this.EsCorrecto)
-            {
-                return default(T);
-            }
-
-            try
-            {
-                Type Tipo = typeof(T);
-                string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
-
-                PropertyInfo[] PropInfo = Tipo.GetProperties();
-
-                foreach (DataRow Row in ResultadoTipoQuery.Rows)
-                {
-                    T obj = (T)Activator.CreateInstance(typeof(T));
-
-                    for (int i = 0; i < Propiedades.Length; i++)
+                    if (IsList)
                     {
-                        if (ResultadoTipoQuery.Columns.Contains(Propiedades[i]))
-                        {
-                            object DataCell = Row[Propiedades[i]];
-                            Type TypeCell = PropInfo[i].PropertyType;
-
-                            if (!Row.IsNull(Propiedades[i]) || !(System.DBNull.Value == DataCell))
-                            {
-                                if (TypeCell.IsGenericType && TypeCell.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                                {
-                                    TypeCell = Nullable.GetUnderlyingType(TypeCell);
-                                }
-
-                                PropInfo[i].SetValue(obj, Convert.ChangeType(DataCell, TypeCell));
-                            }
-                        }
+                        Resultado.GetType().GetMethod("Add").Invoke(Resultado, new[] { obj });
                     }
-
-                    return obj;
+                    else
+                    {
+                        return (T)obj;
+                    }
                 }
 
-                return default(T);
+                return (T)Resultado;
             }
             catch (Exception Ex)
             {

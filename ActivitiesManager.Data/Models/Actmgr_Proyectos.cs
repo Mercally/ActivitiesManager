@@ -14,8 +14,7 @@ namespace ActivitiesManager.Data.Models
         public List<Proyecto> ObtenerTodos()
         {
             var Query = QueryBuilder.CreateQuery(typeof(Proyecto));
-            return Ejecutar(Query)
-                .ConvertirResultadoLista<Proyecto>();
+            return Ejecutar<List<Proyecto>>(Query);
         }
     }
 }

@@ -4,6 +4,8 @@ using ActivitiesManager.Data.Models.Query;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Reflection;
 
 namespace ActivitiesManager.Data.Context
 {
@@ -18,21 +20,60 @@ namespace ActivitiesManager.Data.Context
 
         private ICustomContext Contexto { get; set; }
 
-        public QueryResult Ejecutar(QueryBuilder Consulta)
+        public T Ejecutar<T>(QueryBuilder Consulta)
         {
-            QueryResult Resultado = new QueryResult();
-
+            QueryResult qResultado = new QueryResult();
+            object Result = null;
             try
             {
-                Resultado = this.Contexto.Ejecutar(Consulta);
+                qResultado = this.Contexto.Ejecutar(Consulta);
+                Result = qResultado.ConvertirResultado<T>();
             }
             catch (Exception ex)
             {
-                Resultado.Excepcion = ex;
+                qResultado.Excepcion = ex;
                 this.Contexto.Excepciones(ex);
             }
 
-            return Resultado;
+            return (T)Result;
         }
+
+        //private Object Resultado(QueryResult resultado)
+        //{
+        //    if (resultado.EsCorrecto)
+        //    {
+        //        throw new Exception("Error al ejecutar la consulta");
+        //    }
+        //    else
+        //    {
+        //        var Result = resultado.ConvertiresultadoUnico(Consulta.PrincipalType);
+
+        //        if (Consulta.Includes.Length > 0)
+        //        {
+        //            var Propiedades = Consulta.PrincipalType.GetProperties().ToArray();
+        //            foreach (var Include in Consulta.Includes)
+        //            {
+        //                PropertyInfo Property = null;
+        //                foreach (var Prop in Propiedades)
+        //                {
+        //                    if (Prop.Name == Include)
+        //                    {
+        //                        Property = Prop;
+        //                    }
+        //                }
+
+        //                Type PropType = Property.PropertyType;
+        //                var SubQuery = QueryBuilder.CreateQuery(PropType);
+
+        //                var SubProp = Ejecutar(SubQuery).ConvertiresultadoUnico(SubQuery.PrincipalType);
+
+        //                if (Result != null)
+        //                {
+        //                    Property.SetValue(Result, SubProp);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

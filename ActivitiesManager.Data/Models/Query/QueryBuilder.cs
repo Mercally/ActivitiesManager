@@ -14,14 +14,17 @@ namespace ActivitiesManager.Data.Models.Query
             this.Parametros = new List<SqlParameter>();
             this.TieneError = false;
             this.TimeOut = TimeOut;
+            this.Includes = new string[] { };
         }
 
-        public QueryBuilder(string ConsultaCruda, List<SqlParameter> Params = null, int TimeOut = 1)
+        public QueryBuilder(string ConsultaCruda, TypeQueryEnum TypeQueryEnum, List<SqlParameter> Params = null, int TimeOut = 1)
         {
+            this.TipoConsulta = TypeQueryEnum;
             this.ConsultaCruda = ConsultaCruda;
             this.Parametros = Params ?? new List<SqlParameter>();
             this.TieneError = false;
             this.TimeOut = TimeOut;
+            this.Includes = new string[] { };
         }
 
         /// <summary>
@@ -49,6 +52,26 @@ namespace ActivitiesManager.Data.Models.Query
         /// </summary>
         public bool TieneError { get; internal set; }
 
+        public string[] Includes { get; set; }
+
+        public Type PrincipalType { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Includes"></param>
+        /// <returns></returns>
+        public QueryBuilder Include(string Includes)
+        {
+            if (string.IsNullOrEmpty(Includes))
+            {
+                throw new ArgumentNullException("Includes es un parámetro obligatorio. Contiene propiedades a inicializar sepadatas por punto.");
+            }
+
+            this.Includes = Includes.Split(".");
+            return this;
+        }
+
         /// <summary>
         /// Crea SELECT
         /// </summary>
@@ -60,6 +83,8 @@ namespace ActivitiesManager.Data.Models.Query
 
             Query = CreateSELECT(null, type);
             Query.TipoConsulta = TypeQueryEnum.SELECT;
+            Query.PrincipalType = type;
+
             return Query;
         }
 
@@ -114,19 +139,22 @@ namespace ActivitiesManager.Data.Models.Query
             }
             
             var TableName = Tipo.GetCustomAttributesData()[0].ConstructorArguments[0].Value;
-            string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
+            PropertyInfo[] PropInfo = Tipo.GetProperties();
 
             string SqlQuery = $"SELECT ";
 
-            foreach (var Column in Propiedades)
+            foreach (var Prop in PropInfo)
             {
-                SqlQuery += Column + ", ";
+                var Attrs = Prop.GetCustomAttributes().Select(x => x.GetType().Name).ToArray();
+
+                if (Attrs.Contains("ColumnAttribute"))
+                    SqlQuery += Prop.Name + ", ";
             }
 
             SqlQuery = SqlQuery.Substring(0, (SqlQuery.Length - 2));
             SqlQuery += $" FROM {TableName};";
 
-            return new QueryBuilder(SqlQuery);
+            return new QueryBuilder(SqlQuery, TypeQueryEnum.SELECT);
         }
 
         /// <summary>
@@ -176,7 +204,7 @@ namespace ActivitiesManager.Data.Models.Query
             Values = Values.Substring(0, (Values.Length - 2));
             SqlQuery = Insert + Values + "); SELECT SCOPE_IDENTITY();";
 
-            return new QueryBuilder(SqlQuery, ListParameters);
+            return new QueryBuilder(SqlQuery, TypeQueryEnum.INSERT, ListParameters);
         }
 
         /// <summary>
@@ -223,7 +251,7 @@ namespace ActivitiesManager.Data.Models.Query
             SqlQuery = SqlQuery.Substring(0, (SqlQuery.Length - 2));
             SqlQuery += Where;
 
-            return new QueryBuilder(SqlQuery, ListParameters);
+            return new QueryBuilder(SqlQuery, TypeQueryEnum.UPDATE, ListParameters);
         }
 
         /// <summary>
@@ -237,19 +265,21 @@ namespace ActivitiesManager.Data.Models.Query
             Type Tipo = Obj.GetType();
             var TableName = Tipo.GetCustomAttributesData()[0].ConstructorArguments[0].Value;
             string SqlQuery = string.Empty;
-
+            TypeQueryEnum TypeQuery = TypeQueryEnum.SELECT;
             List<SqlParameter> ListParameters = new List<SqlParameter>();
             if (IsLogical)
             {
                 SqlQuery = $"UPDATE {TableName} SET EsActivo = 0;";
+                TypeQuery = TypeQueryEnum.UPDATE;
             }
             else
             {
                 SqlQuery = $"DELETE {TableName} WHERE Id = @Id;";
                 ListParameters.Add(new SqlParameter("@Id", 1));
+                TypeQuery = TypeQueryEnum.DELETE;
             }
 
-            return new QueryBuilder(SqlQuery, ListParameters);
+            return new QueryBuilder(SqlQuery, TypeQuery, ListParameters);
         }
     }
 }

@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\ServiceCommonApi\Data\" />
-    <Folder Include="Areas\ServiceCommonApi\Models\" />
-    <Folder Include="Areas\ServiceCommonApi\Views\" />
+    <Folder Include="Areas\ServiceCommon\Data\" />
+    <Folder Include="Areas\ServiceCommon\Models\" />
+    <Folder Include="Areas\ServiceCommon\Views\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

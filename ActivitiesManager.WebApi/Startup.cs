@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ActivitiesManager.Business;
+﻿using ActivitiesManager.Business;
 using ActivitiesManager.Business.Common;
 using ActivitiesManager.Data.Connections;
 using ActivitiesManager.Data.Context;
@@ -11,8 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace ActivitiesManager.WebApi
 {
@@ -23,7 +17,7 @@ namespace ActivitiesManager.WebApi
             Configuration = configuration;
         }
 
-        public static IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,13 +26,7 @@ namespace ActivitiesManager.WebApi
 
             services.AddSingleton(Configuration);
 
-            services.AddTransient<IBaseDeDatos, BasesDeDatos>();
-
-            services.AddTransient<IActivitiesManagerProvider, ActivitiesManagerProvider>();
-
-            services.AddTransient<IServiceComponent, ProyectoBusiness>();
-
-            services.AddTransient<IServiceBusiness, ServiceBusiness>();
+            services.AddSingleton<IServiceBusiness, ServiceBusiness>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

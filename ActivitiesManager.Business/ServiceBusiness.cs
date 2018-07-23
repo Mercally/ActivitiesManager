@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ActivitiesManager.Business.Common;
+﻿using ActivitiesManager.Business.Common;
 
 namespace ActivitiesManager.Business
 {
     public class ServiceBusiness : IServiceBusiness
     {
-        public ServiceBusiness(
-            IServiceComponent serviceComponent
-            )
+        public ServiceBusiness()
         {
-            ProyectoBusiness = serviceComponent;
+
         }
 
-        public IServiceComponent ProyectoBusiness { get; }
+        public ProyectoBusiness ProyectoBusiness { get { return new ProyectoBusiness(); } }
+
+        public ActividadBusiness ActividadBusiness { get { return new ActividadBusiness(); } }
     }
 }

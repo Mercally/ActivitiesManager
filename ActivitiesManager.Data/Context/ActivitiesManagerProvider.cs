@@ -5,32 +5,28 @@ using ActivitiesManager.Data.Models.Query;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace ActivitiesManager.Data.Context
 {
     /// <summary>
     /// Almacena todas las clases de modelo de la base de datos
     /// </summary>
-    public class ActivitiesManagerProvider : IDisposable, ICustomContext, IActivitiesManagerProvider
+    public class ActivitiesManagerProvider : IDisposable, ICustomContext
     {
-        public IBaseDeDatos BaseDeDatos { get; set; }
-
         /// <summary>
         /// Constructor por defecto
         /// </summary>
-        public ActivitiesManagerProvider(IBaseDeDatos baseDeDatos)
+        public ActivitiesManagerProvider()
         {
-            BaseDeDatos = baseDeDatos;
             this.ListaExcepciones = new List<Exception>();
-
+            
             try
             {
                 Byte Pasos = 0;
                 // Inicializa una conexion:
                 if (this.Conexion == null)
                 {
-                    this.Conexion = BaseDeDatos.Connect("ActivitiesManagerDataBase");
+                    this.Conexion = BasesDeDatos.Connect("ActivitiesManagerDataBase");
                     Pasos += 1;
                 }
 
@@ -144,7 +140,9 @@ namespace ActivitiesManager.Data.Context
         /// <returns></returns>
         public QueryResult Ejecutar(QueryBuilder Consulta)
         {
-            return Comandos.Ejecutar(Consulta);
+            QueryResult Ejecucion = Comandos.Ejecutar(Consulta);
+            Ejecucion.Consulta = Consulta;
+            return Ejecucion;
         }
 
         /*
@@ -156,6 +154,14 @@ namespace ActivitiesManager.Data.Context
             get
             {
                 return new Actmgr_Proyectos(this);
+            }
+        }
+
+        public Actmgr_Actividades Actmgr_Actividades
+        {
+            get
+            {
+                return new Actmgr_Actividades(this);
             }
         }
     }

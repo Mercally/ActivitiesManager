@@ -8,7 +8,6 @@ namespace ActivitiesManager.Data.Interfaces
 {
     public interface ICustomContext
     {
-        IBaseDeDatos BaseDeDatos { get; set; }
 
         void CommitOrRollback();
 

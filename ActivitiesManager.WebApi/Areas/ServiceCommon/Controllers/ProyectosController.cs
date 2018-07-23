@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using ActivitiesManager.Business;
 using Microsoft.AspNetCore.Mvc;
-using ActivitiesManager.Shared.Models;
-using ActivitiesManager.Business.Common;
-using ActivitiesManager.Business;
 
-namespace ActivitiesManager.WebApi.Areas.ServiceCommonApi.Controllers
+namespace ActivitiesManager.WebApi.Areas.ServiceCommon.Controllers
 {
     [Produces("application/json")]
-    [Route("ServiceCommonApi/api/Proyectos")]
+    [Route("ServiceCommon/api/Proyectos")]
     public class ProyectosController : Controller
     {
         public ProyectosController(IServiceBusiness serviceBusiness)
@@ -24,7 +17,9 @@ namespace ActivitiesManager.WebApi.Areas.ServiceCommonApi.Controllers
         [HttpGet]
         public IActionResult ObtenerTodo()
         {
-            var Todo = ServiceBusiness.ProyectoBusiness.ObtenerTodos();
+            var Todo = ServiceBusiness
+                .ProyectoBusiness
+                .ObtenerTodos();
 
             if (Todo == null)
             {
