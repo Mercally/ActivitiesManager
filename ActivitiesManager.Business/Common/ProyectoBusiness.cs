@@ -20,5 +20,25 @@ namespace ActivitiesManager.Business.Common
 
             return Todos;
         }
+
+        public Proyecto ObtenerPorId(int id)
+        {
+            Proyecto Todo = new Proyecto();
+
+            using (var DbProvider = new ActivitiesManagerProvider())
+            {
+                Todo = DbProvider
+                        .Actmgr_Proyectos
+                        .ObtenerPorId(id);
+                if (Todo != null)
+                {
+                    Todo.Actividades = DbProvider
+                        .Actmgr_Actividades
+                        .ObtenerTodosPorProyectoId<List<Actividad>>(Todo.Id);
+                }
+            }
+
+            return Todo;
+        }
     }
 }

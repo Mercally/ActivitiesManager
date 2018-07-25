@@ -52,7 +52,7 @@ namespace ActivitiesManager.Data.Models.Query
         /// </summary>
         public bool TieneError { get; internal set; }
 
-        public string[] Includes { get; set; }
+        private string[] Includes { get; set; }
 
         public Type PrincipalType { get; set; }
 
@@ -69,6 +69,9 @@ namespace ActivitiesManager.Data.Models.Query
             }
 
             this.Includes = Includes.Split(".");
+
+
+
             return this;
         }
 
@@ -82,6 +85,26 @@ namespace ActivitiesManager.Data.Models.Query
             QueryBuilder Query = new QueryBuilder();
 
             Query = CreateSELECT(null, type);
+            Query.TipoConsulta = TypeQueryEnum.SELECT;
+            Query.PrincipalType = type;
+
+            return Query;
+        }
+
+        /// <summary>
+        /// Crea SELECT con condicionante por Id
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="id">Valor de la columna a condicionar</param>
+        /// <param name="columnKey">Nombre de la columna</param>
+        /// <returns></returns>
+        public static QueryBuilder CreateQueryById(Type type, int id, string columnKey = null)
+        {
+            QueryBuilder Query = new QueryBuilder();
+
+            Query = CreateSELECT(null, type);
+            Query.ConsultaCruda = 
+                Query.ConsultaCruda.Replace(";", $" WHERE {columnKey ?? "Id"} = {id};");
             Query.TipoConsulta = TypeQueryEnum.SELECT;
             Query.PrincipalType = type;
 
@@ -237,7 +260,7 @@ namespace ActivitiesManager.Data.Models.Query
 
                 if (Attrs.Contains("KeyAttribute"))
                 {
-                    Where = $"WHERE {Column}={Param};";
+                    Where = $" WHERE {Column}={Param};";
                     ListParameters.Add(new SqlParameter(Param, Value));
                     continue;
                 }

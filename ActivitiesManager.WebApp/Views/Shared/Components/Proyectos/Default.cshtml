@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Proyecto>
+
+@{
+    Layout = null;
+    string parameters = string.Empty;
+}
+
+
+<div class="container">
+    <h2>Proyectos</h2>
+    <p>
+        Los proyecto almacenan actividade ue puedite haber realizado dentro de cada uno de ellos, organiza de esta forma
+        el tiempo que ha invertido en cada uno de ello, adicionalmente, puede aregar actividade ue hará y etá e te pueden notificar autoáticamente
+        a manera de recordatorio.
+    </p>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">Inicio</a></li>
+        @foreach (var item in Model)
+        {
+            <li>
+                <a data-toggle="tab" id="aproject-@item.Id" href="#project-@item.Id" class="buttonLoadComponentAjax">
+                    @Html.DisplayFor(modelItem => item.Nombre)
+                </a>
+            </li>
+        }
+    </ul>
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <h3>Inicio</h3>
+            <p></p>
+            <form action="/proyecto/create" method="post">
+                <input type="text" name="name" value="" />
+            </form>
+        </div>
+        @foreach (var item in Model)
+        {
+            {
+                parameters = $"{{ \"id\": {item.Id} }}";
+            }
+
+            <div id="project-@item.Id" data-view-url-ajax="proyectos/details" data-view-parameters-ajax="@parameters" class="tab-pane fade in innerLoadComponentAjax"></div>
+        }
+    </div>
+</div>

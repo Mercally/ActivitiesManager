@@ -32,5 +32,19 @@ namespace ActivitiesManager.Data.Models
                 );
             return Ejecutar<Actividad>(Query);
         }
+
+        public T ObtenerTodosPorProyectoId<T>(int id)
+        {
+            var Query = new QueryBuilder(
+                ConsultaCruda: "SELECT Id, Nombre FROM actmgr.Actividades WHERE ProyectoId = @id;",
+                TypeQueryEnum: TypeQueryEnum.SELECT,
+                Params: new List<SqlParameter>()
+                    {
+                        new SqlParameter("id", id)
+                    }
+                );
+
+            return Ejecutar<T>(Query);
+        }
     }
 }

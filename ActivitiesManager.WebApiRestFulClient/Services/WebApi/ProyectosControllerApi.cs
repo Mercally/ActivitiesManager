@@ -47,5 +47,14 @@ namespace ActivitiesManager.WebApiRestFulClient.Services.WebApi
             return Help;
         }
 
+
+        public HttpResponse<Proyecto> ObtenerPorId(int id)
+        {
+            return RequestHelper.Request<Proyecto>
+               (
+               Url: $"{ApiUri}/{id}",
+               Method: HttpMethodEnum.Get
+               );
+        }
     }
 }

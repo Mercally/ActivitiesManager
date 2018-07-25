@@ -30,5 +30,23 @@ namespace ActivitiesManager.WebApi.Areas.ServiceCommon.Controllers
                 return Ok(Todo);
             }
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult ObtenerPorId(int id)
+        {
+            var Todo = ServiceBusiness
+                .ProyectoBusiness
+                .ObtenerPorId(id);
+
+            if (Todo == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(Todo);
+            }
+        }
     }
 }

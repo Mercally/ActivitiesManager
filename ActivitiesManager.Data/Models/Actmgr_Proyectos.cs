@@ -16,5 +16,11 @@ namespace ActivitiesManager.Data.Models
             var Query = QueryBuilder.CreateQuery(typeof(Proyecto));
             return Ejecutar<List<Proyecto>>(Query);
         }
+
+        public Proyecto ObtenerPorId(int id)
+        {
+            var Query = QueryBuilder.CreateQueryById(typeof(Proyecto), id);
+            return Ejecutar<Proyecto>(Query);
+        }
     }
 }

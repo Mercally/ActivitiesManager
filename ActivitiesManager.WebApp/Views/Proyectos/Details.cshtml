@@ -1,0 +1,21 @@
+﻿@model Proyecto
+
+@{
+    Layout = null;
+}
+<div>
+    <p>Actividade del proyecto</p>
+    <table class="table table-hover table-striped table-responsive">
+        <thead>
+            <tr><th>Actividad</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Actividades)
+            {
+
+                <tr><td>@item.Nombre</td></tr>
+            }
+        </tbody>
+        <tfoot></tfoot>
+    </table>
+</div>
