@@ -1,0 +1,37 @@
+﻿@model ActivitiesManager.Shared.Models.BaseModelError
+
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.HasException)
+{
+    <h3>Exception:</h3>
+    <p>
+        <strong>Message: </strong>@Model.Exception.Message
+    </p>
+    <p>
+        <strong>Source: </strong>@Model.Exception.Source
+    </p>
+    <p>
+        <strong>StackTrace: </strong>@Model.Exception.StackTrace
+    </p>
+}
+
+@if (Model.HasInnerException)
+{
+    <hr />
+    <h3>Inner Exception:</h3>
+    <p>
+        <strong>Message: </strong>@Model.Exception.InnerException.Message
+    </p>
+    <p>
+        <strong>Source: </strong>@Model.Exception.InnerException.Source
+    </p>
+    <p>
+        <strong>StackTrace: </strong>@Model.Exception.InnerException.StackTrace
+    </p>
+}

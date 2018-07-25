@@ -9,7 +9,7 @@ using ActivitiesManager.Shared.Models.Web;
 
 namespace ActivitiesManager.WebApiRestFulClient
 {
-    internal class HelperRequester
+    internal class RequestHelper
     {
         /// <summary>
         /// Envía una petición a la url especificada con las opciones
@@ -55,8 +55,7 @@ namespace ActivitiesManager.WebApiRestFulClient
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        T result = response.Content.ReadAsAsync<T>().Result;
-                        Value = result;
+                        Value = response.Content.ReadAsAsync<T>().Result;
                     }
 
                     HttpStatus = response.StatusCode;
@@ -65,6 +64,8 @@ namespace ActivitiesManager.WebApiRestFulClient
                 {
                     // Excepciones
                     Value = default(T);
+                    Response.StatusCode = HttpStatusCode.InternalServerError;
+                    Response.Exception = ex;
                 }
             }
 
@@ -74,8 +75,12 @@ namespace ActivitiesManager.WebApiRestFulClient
             return Response;
         }
 
-        internal static async Task<T> RequestAsync<T>(string Url, HttpMethodEnum Method, object Data = null, int TimeOut = 1)
+        internal static async Task<HttpResponse<T>> RequestAsync<T>(string Url, HttpMethodEnum Method, object Data = null, int TimeOut = 1)
         {
+            var Response = new HttpResponse<T>();
+            T Value = default(T);
+            HttpStatusCode HttpStatus = HttpStatusCode.OK;
+
             using (HttpClient client = new HttpClient())
             {
                 try
@@ -104,20 +109,24 @@ namespace ActivitiesManager.WebApiRestFulClient
 
                     if (response.IsSuccessStatusCode)
                     {
-                        T result = await response.Content.ReadAsAsync<T>();
-                        return result;
+                        Value = await response.Content.ReadAsAsync<T>();
                     }
-                    else
-                    {
-                        return default(T);
-                    }
+
+                    HttpStatus = response.StatusCode;
                 }
                 catch (Exception ex)
                 {
                     // Excepciones
-                    return default(T);
+                    Value = default(T);
+                    Response.StatusCode = HttpStatusCode.InternalServerError;
+                    Response.Exception = ex;
                 }
             }
+
+            Response.Value = Value;
+            Response.StatusCode = HttpStatus;
+
+            return Response;
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ActivitiesManager.WebApiRestFulClient;
 
 namespace ActivitiesManager.WebApp
 {
@@ -22,6 +23,8 @@ namespace ActivitiesManager.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddSingleton<IPublicServicesWebApi, PublicServicesWebApi>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
