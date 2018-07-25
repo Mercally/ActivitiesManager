@@ -13,32 +13,38 @@
         el tiempo que ha invertido en cada uno de ello, adicionalmente, puede aregar actividade ue hará y etá e te pueden notificar autoáticamente
         a manera de recordatorio.
     </p>
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#home">Inicio</a></li>
-        @foreach (var item in Model)
-        {
-            <li>
-                <a data-toggle="tab" id="aproject-@item.Id" href="#project-@item.Id" class="buttonLoadComponentAjax">
-                    @Html.DisplayFor(modelItem => item.Nombre)
-                </a>
-            </li>
-        }
-    </ul>
-    <div class="tab-content">
-        <div id="home" class="tab-pane fade in active">
-            <h3>Inicio</h3>
-            <p></p>
-            <form action="/proyecto/create" method="post">
-                <input type="text" name="name" value="" />
-            </form>
-        </div>
-        @foreach (var item in Model)
-        {
-            {
-                parameters = $"{{ \"id\": {item.Id} }}";
-            }
 
-            <div id="project-@item.Id" data-view-url-ajax="proyectos/details" data-view-parameters-ajax="@parameters" class="tab-pane fade in innerLoadComponentAjax"></div>
-        }
+    <div class="col-sm-6">
+        <div class="col-xs-3">
+            <ul class="nav nav-tabs tabs-left">
+                <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
+                @foreach (var item in Model)
+                {
+                    <li>
+                        <a data-toggle="tab" id="aproject-@item.Id" href="#project-@item.Id" class="buttonLoadComponentAjax">
+                            @Html.DisplayFor(modelItem => item.Nombre)
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-xs-9">
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <h3>Inicio</h3>
+                    <p></p>
+                    @await Component.InvokeAsync("ProyectoFormCreate")
+                </div>
+                @foreach (var item in Model)
+                {
+                    {
+                        parameters = $"{{ \"id\": {item.Id} }}";
+                    }
+
+                    <div id="project-@item.Id" class="tab-pane fade in innerLoadComponentAjax" data-view-url-ajax="proyectos/details" data-view-parameters-ajax="@parameters"></div>
+                }
+            </div>
+        </div>
+        <div class="clearfix"></div>
     </div>
 </div>

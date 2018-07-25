@@ -56,5 +56,15 @@ namespace ActivitiesManager.WebApiRestFulClient.Services.WebApi
                Method: HttpMethodEnum.Get
                );
         }
+
+        public async Task<HttpResponse<int>> CrearAsync(Proyecto proyecto)
+        {
+            return await RequestHelper.RequestAsync<int>
+               (
+               Url: ApiUri,
+               Method: HttpMethodEnum.PostJson,
+               Data: proyecto
+               );
+        }
     }
 }

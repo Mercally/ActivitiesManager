@@ -1,11 +1,13 @@
 ﻿using ActivitiesManager.Shared.Notations.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using DbNotations = ActivitiesManager.Shared.Notations.Data;
 
 namespace ActivitiesManager.Shared.Models
 {
-    [Table("actmgr.Proyectos")]
+    [DbNotations.Table("actmgr.Proyectos")]
     public class Proyecto
     {
         public Proyecto()
@@ -13,13 +15,17 @@ namespace ActivitiesManager.Shared.Models
             Actividades = new List<Actividad>();
         }
 
-        [Key]
-        [Column]
+        [DbNotations.Key]
+        [DbNotations.Column]
+        
         public int Id { get; set; }
-        [Column]
+
+        [DbNotations.Column]
+        [Display(Name = "Nombres")]
+        [MaxLength(10)]
         public string Nombre { get; set; }
 
-        [ForeignKey("actmgr.Actividades", "ProyectoId")]
+        [DbNotations.ForeignKey("actmgr.Actividades", "ProyectoId")]
         public List<Actividad> Actividades { get; set; }
     }
 }

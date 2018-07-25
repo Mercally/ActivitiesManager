@@ -1,5 +1,6 @@
 ﻿// Write your JavaScript code.
 
+var _submitForm = false;
 const LoadComponentAjax = '<center><div class="load-component-ajax"><div class="loader"></div></div></center>';
 function CustomErrorComponentAjax(elementId) {
     var ErrorComponentAjax =
@@ -16,11 +17,7 @@ function CustomErrorComponentAjax(elementId) {
 $(function () {
     $("div.innerLoadComponentAjax").html(LoadComponentAjax);
     $("div.load-component-ajax").hide();
-
-    function sleep(delay) {
-        var start = new Date().getTime();
-        while (new Date().getTime() < start + delay);
-    }
+    $("form.form-validate").attr("onsubmit", "javascript: return submitForm(this);")
 
     $("body").on("click", "a.buttonLoadComponentAjax", function (event) {
         event.preventDefault();
@@ -64,6 +61,12 @@ $(function () {
         }
     });
 
+    $("body").on("click", "input.btn-submit", function (event) {
+        event.preventDefault();
+        var targetFormId = $(this).parents("form").attr("id");
+        $("form#" + targetFormId).submit();
+    });
+
     function getFormData(object) {
         var form_data = new FormData();
         var props = Object.getOwnPropertyNames(object);
@@ -81,4 +84,34 @@ $(function () {
     function showLoadComponent(elementId) {
         $(elementId + " div.load-component-ajax").show();
     }
-})
+
+    function handlerError(message, view, moreInfo) {
+        console.error(message, view, moreInfo);
+    }
+
+    function isValid(formId) {
+        if (formId) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+});
+
+
+function submitForm(target) {
+    var $this = $(target);
+    if (true) {
+        let message = $this.data('confirm-message') || '<h3>¿Desea continuar?</h3>Revise la información antes de continuar.';
+        if (confirm(message)) {
+            _submitForm = true;
+            return;
+            $this.submit();
+        } else {
+            _submitForm = false;
+        }
+    } else {
+        _submitForm = false;
+    }
+    return _submitForm;
+}

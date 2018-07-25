@@ -22,5 +22,11 @@ namespace ActivitiesManager.Data.Models
             var Query = QueryBuilder.CreateQueryById(typeof(Proyecto), id);
             return Ejecutar<Proyecto>(Query);
         }
+
+        public int Crear(Proyecto proyecto)
+        {
+            var Query = QueryBuilder.CreateQuery(proyecto, TypeQueryEnum.INSERT);
+            return Ejecutar<int>(Query);
+        }
     }
 }

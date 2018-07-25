@@ -1,4 +1,5 @@
 ﻿using ActivitiesManager.Business;
+using ActivitiesManager.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivitiesManager.WebApi.Areas.ServiceCommon.Controllers
@@ -46,6 +47,23 @@ namespace ActivitiesManager.WebApi.Areas.ServiceCommon.Controllers
             else
             {
                 return Ok(Todo);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Crear([FromBody]Proyecto proyecto)
+        {
+            var Id = ServiceBusiness
+                .ProyectoBusiness
+                .Crear(proyecto);
+
+            if (Id <= 0)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(Id);
             }
         }
     }

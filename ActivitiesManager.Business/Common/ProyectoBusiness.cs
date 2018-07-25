@@ -40,5 +40,19 @@ namespace ActivitiesManager.Business.Common
 
             return Todo;
         }
+
+        public int Crear(Proyecto proyecto)
+        {
+            int Id = 0;
+
+            using (var DbProvider = new ActivitiesManagerProvider())
+            {
+                Id = DbProvider
+                        .Actmgr_Proyectos
+                        .Crear(proyecto);
+            }
+
+            return Id;
+        }
     }
 }

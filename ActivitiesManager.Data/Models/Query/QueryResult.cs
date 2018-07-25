@@ -10,13 +10,12 @@ namespace ActivitiesManager.Data.Models.Query
 {
     public class QueryResult : IQueryResult
     {
-        public int ResultadoTipoInsert { get; set; }
-        public bool ResultadoTipoUpdate { get; set; }
-        public bool ResultadoTipoDelete { get; set; }
-        public DataTable ResultadoTipoQuery { get; set; }
+        internal int ResultadoTipoInsert { get; set; }
+        internal bool ResultadoTipoUpdate { get; set; }
+        internal bool ResultadoTipoDelete { get; set; }
+        internal DataTable ResultadoTipoQuery { get; set; }
         public int CantidadCambios { get; set; }
         public System.Exception Excepcion { get; set; }
-        public object Resultado { get; set; }
         
         public QueryBuilder Consulta { get; set; }
 
@@ -35,15 +34,48 @@ namespace ActivitiesManager.Data.Models.Query
         /// <returns>Lista de objetos de tipo especificado</returns>
         public T ConvertirResultado<T>()
         {
-            bool IsList = false;
-            Object Resultado = null;
-            Type ArgumentType = null;
-            Type Tipo = null;
-
             if (!this.EsCorrecto)
             {
                 return default(T);
             }
+
+            Object Resultado = null;
+
+            try
+            {
+                switch (Consulta.TipoConsulta)
+                {
+                    case TypeQueryEnum.INSERT:
+                        Resultado = ResultadoTipoInsert;
+                        break;
+                    case TypeQueryEnum.UPDATE:
+                        Resultado = ResultadoTipoUpdate;
+                        break;
+                    case TypeQueryEnum.DELETE:
+                        Resultado = ResultadoTipoDelete;
+                        break;
+                    case TypeQueryEnum.SELECT:
+                        Resultado = ConvertirResultadoQuery<T>();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception Ex)
+            {
+                Excepcion = Ex;
+                Resultado = default(T);
+            }
+
+            return (T)Resultado;
+        }
+
+        private T ConvertirResultadoQuery<T>()
+        {
+            bool IsList = false;
+            Object Resultado = null;
+            Type ArgumentType = null;
+            Type Tipo = null;
 
             var CurrentType = typeof(T);
             if (CurrentType.IsGenericType && CurrentType.GetGenericTypeDefinition() == typeof(List<>))
@@ -62,60 +94,52 @@ namespace ActivitiesManager.Data.Models.Query
                 IsList = false;
                 Tipo = typeof(T);
             }
-            
-            try
-            {   
-                string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
-                PropertyInfo[] PropInfo = Tipo.GetProperties();
 
-                foreach (DataRow Row in ResultadoTipoQuery.Rows)
+            string[] Propiedades = Tipo.GetProperties().Select(x => x.Name).ToArray();
+            PropertyInfo[] PropInfo = Tipo.GetProperties();
+
+            foreach (DataRow Row in ResultadoTipoQuery.Rows)
+            {
+                Object obj = null;
+                if (IsList)
                 {
-                    Object obj = null;
-                    if (IsList)
-                    {
-                        obj = Activator.CreateInstance(ArgumentType);
-                    }
-                    else
-                    {
-                        obj = Activator.CreateInstance(typeof(T));
-                    }
+                    obj = Activator.CreateInstance(ArgumentType);
+                }
+                else
+                {
+                    obj = Activator.CreateInstance(typeof(T));
+                }
 
-                    for (int i = 0; i < Propiedades.Length; i++)
+                for (int i = 0; i < Propiedades.Length; i++)
+                {
+                    if (ResultadoTipoQuery.Columns.Contains(Propiedades[i]))
                     {
-                        if (ResultadoTipoQuery.Columns.Contains(Propiedades[i]))
+                        object DataCell = Row[Propiedades[i]];
+                        Type TypeCell = PropInfo[i].PropertyType;
+
+                        if (!Row.IsNull(Propiedades[i]) || !(System.DBNull.Value == DataCell))
                         {
-                            object DataCell = Row[Propiedades[i]];
-                            Type TypeCell = PropInfo[i].PropertyType;
-
-                            if (!Row.IsNull(Propiedades[i]) || !(System.DBNull.Value == DataCell))
+                            if (TypeCell.IsGenericType && TypeCell.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                             {
-                                if (TypeCell.IsGenericType && TypeCell.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                                {
-                                    TypeCell = Nullable.GetUnderlyingType(TypeCell);
-                                }
-
-                                PropInfo[i].SetValue(obj, Convert.ChangeType(DataCell, TypeCell));
+                                TypeCell = Nullable.GetUnderlyingType(TypeCell);
                             }
-                        }
-                    }
 
-                    if (IsList)
-                    {
-                        Resultado.GetType().GetMethod("Add").Invoke(Resultado, new[] { obj });
-                    }
-                    else
-                    {
-                        return (T)obj;
+                            PropInfo[i].SetValue(obj, Convert.ChangeType(DataCell, TypeCell));
+                        }
                     }
                 }
 
-                return (T)Resultado;
+                if (IsList)
+                {
+                    Resultado.GetType().GetMethod("Add").Invoke(Resultado, new[] { obj });
+                }
+                else
+                {
+                    return (T)obj;
+                }
             }
-            catch (Exception Ex)
-            {
-                Excepcion = Ex;
-                return default(T);
-            }
+
+            return (T)Resultado;
         }
     }
 }

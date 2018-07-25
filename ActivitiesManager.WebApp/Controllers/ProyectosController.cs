@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using ActivitiesManager.Shared.Models;
 using ActivitiesManager.WebApiRestFulClient;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ActivitiesManager.WebApp.Controllers
 {
@@ -24,6 +22,23 @@ namespace ActivitiesManager.WebApp.Controllers
                 .ObtenerPorId(id);
 
             return View(Detalle.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Proyecto proyecto)
+        {
+            var Id = await PublicServicesWebApi
+                .ProyectosControllerApi
+                .CrearAsync(proyecto);
+
+            if (Id.IsCorrect)
+            {
+                return RedirectToRoute("default");
+            }
+            else
+            {
+                return RedirectToAction("error", "home");
+            }
         }
     }
 }
